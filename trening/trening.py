@@ -3,18 +3,34 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, GridSearchCV
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 df = pd.read_csv("plant_health_dataset.csv")
 
-df = df[df['PlantAge'] > 36]  # interesują nas starsze rośliny
-#
-df['wigor'] = df['GreenColorIntensity'] * df['NumLeaves'] * df['PlantHeight']
-df['srodowisko'] = df['SpotArea'] * df['SunExposureLevel']
+# Konwersja tylko kolumn float na int
+df[df.select_dtypes('float').columns] = df.select_dtypes('float').astype(int)
 
-df = df.drop('DustPresence', axis=1)
-df = df.drop('LeafEdgeType', axis=1)
+# df = df[df['PlantAge'] > 36]  # interesują nas starsze rośliny
+#
+# df['wigor'] = df['GreenColorIntensity'] * df['NumLeaves'] * df['PlantHeight']
+# df['srodowisko'] = df['SpotArea'] * df['SunExposureLevel']
+# df['czy_slonecznie'] = df['SunExposureLevel'] > 50
+
+# df = df.drop('DustPresence', axis=1)
+# df = df.drop('LeafEdgeType', axis=1)
 
 print("Brakujące wartości:\n", df.isnull().sum())
+
+# Obliczamy korelację
+corr = df.corr()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+plt.title("Macierz korelacji")
+plt.subplots_adjust(left=0.2, right=0.95, top=0.9, bottom=0.3)
+plt.show()
+
 
 # Podział na cechy i zmienną docelową
 X = df.drop('PlantHealth', axis=1)
@@ -22,7 +38,7 @@ y = df['PlantHealth']
 
 # Podział na zbiór treningowy i testowy
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, test_size=0.3, random_state=42, stratify=y
 )
 
 # Optymalizacja hiperparametrów
