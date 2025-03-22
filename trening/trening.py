@@ -6,10 +6,11 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("plant_health_dataset.csv")
+df = pd.read_csv("Soil Nutrients.csv")
 
 # Konwersja tylko kolumn float na int
-df[df.select_dtypes('float').columns] = df.select_dtypes('float').astype(int)
+df[df.select_dtypes('float').columns] = (df.select_dtypes('float')).astype(int)
+df = df.apply(lambda x: pd.factorize(x)[0] if x.dtype == 'object' else x)
 
 # df = df[df['PlantAge'] > 36]  # interesują nas starsze rośliny
 #
@@ -33,20 +34,18 @@ plt.show()
 
 
 # Podział na cechy i zmienną docelową
-X = df.drop('PlantHealth', axis=1)
-y = df['PlantHealth']
+X = df.drop('Yield', axis=1)
+y = df['Yield']
 
 # Podział na zbiór treningowy i testowy
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
+    X, y, test_size=0.3, random_state=42
 )
 
 # Optymalizacja hiperparametrów
 param_grid = {
-    'n_estimators': [100, 120],
-    'max_depth': [None, 10, 15],
-    'min_samples_split': [2, 5],
-    'class_weight': ['balanced']
+    'n_estimators': [100],
+    'max_depth': [10],
 }
 
 # Model z GridSearch
@@ -78,4 +77,4 @@ feature_importances = pd.DataFrame({
 print("\nFeature Importances:\n", feature_importances)
 
 # Zapis modelu
-joblib.dump(rf_model.best_estimator_, 'plant_health_model.pkl')
+joblib.dump(rf_model.best_estimator_, 'strawberry_model.pkl')
