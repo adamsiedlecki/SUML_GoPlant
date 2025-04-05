@@ -1,5 +1,7 @@
 Jest założenie, że model znadjuje się w katalogu docker.
 
+https://github.com/iamsonubisht/Hate-Speech-Detection/tree/main
+
 Zbudowanie obrazu
 
 ```cmd

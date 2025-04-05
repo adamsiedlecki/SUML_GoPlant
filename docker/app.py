@@ -3,8 +3,11 @@ import pickle
 from flask import Flask, request, jsonify
 
 # Load the pre-trained model
-with open("model.pkl", "rb") as f:
+with open("model.pickle", "rb") as f:
     model = pickle.load(f)
+
+with open("vectorizer.pickle", "rb") as f:
+    vect = pickle.load(f)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -13,7 +16,7 @@ app = Flask(__name__)
 def predict():
     try:
         data = request.get_json()
-        predictions = model.predict([data["input"]])
+        predictions = model.predict(vect.transform([data]).toarray())
         return jsonify({"predictions": predictions.tolist()})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
