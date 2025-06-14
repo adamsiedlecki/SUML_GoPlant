@@ -1,2 +1,2 @@
-flask
-scikit-learn
+streamlit==1.25.0
+pycaret==3.3.2
