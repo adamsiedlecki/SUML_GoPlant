@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 from pycaret.regression import load_model, predict_model
 
+# TODO usunięcie częśći pól (trzeba przetrenować model), poprawa interfejsu, może tłumaczenia dla wartości
+
 ai_model = load_model('best_model')
 
-# Dane do interfejsu
 feature_info = {
     'Fertility': {'type': 'categorical', 'values': ['Moderate']},
     'Photoperiod': {'type': 'categorical', 'values': ['Day Neutral', 'Short Day Period']},
@@ -25,7 +26,6 @@ feature_info = {
     'K_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0}
 }
 
-# Tłumaczenia nazw pól (opcjonalnie dodaj więcej jeśli chcesz)
 translations = {
     'Fertility': 'Żyzność',
     'Photoperiod': 'Fotoperiod',
@@ -50,7 +50,6 @@ st.title("Predykcja truskawek")
 
 user_input = {}
 
-# Tworzenie pól
 for feature, info in feature_info.items():
     label = translations.get(feature, feature)
     if info['type'] == 'categorical':
@@ -65,7 +64,6 @@ for feature, info in feature_info.items():
         else:
             user_input[feature] = st.slider(label, min_value=min_val, max_value=max_val, value=default, format="%.4f")
 
-# Reakcja na przycisk
 if st.button("Sprawdź predykcję"):
     input_df = pd.DataFrame([user_input])
     st.subheader("Dane wejściowe:")
