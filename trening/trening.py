@@ -25,3 +25,5 @@ def train_model(train_data):
     save_model(best_model, 'best_model')
 
     return best_model
+
+train_model(df)
