@@ -1,52 +1,76 @@
-from datetime import datetime
-
 import streamlit as st
 import pandas as pd
 from pycaret.regression import load_model, predict_model
 
 ai_model = load_model('best_model')
 
-current_year = datetime.now().year
+# Dane do interfejsu
+feature_info = {
+    'Fertility': {'type': 'categorical', 'values': ['Moderate']},
+    'Photoperiod': {'type': 'categorical', 'values': ['Day Neutral', 'Short Day Period']},
+    'Temperature': {'type': 'numeric', 'min': 11.4895951867279, 'max': 24.7851260541969},
+    'Rainfall': {'type': 'numeric', 'min': 603.262466985949, 'max': 912.357821862667},
+    'pH': {'type': 'numeric', 'min': 6.01954182231121, 'max': 6.83444527129809},
+    'Light_Hours': {'type': 'numeric', 'min': 11.9530915745843, 'max': 14.0224375398152},
+    'Light_Intensity': {'type': 'numeric', 'min': 397.678455866516, 'max': 608.36827590609},
+    'Rh': {'type': 'numeric', 'min': 89.5019906720046, 'max': 95.1292528088176},
+    'Nitrogen': {'type': 'numeric', 'min': 151.499465257155, 'max': 200.356849479585},
+    'Phosphorus': {'type': 'numeric', 'min': 110.976211751343, 'max': 129.848646332759},
+    'Potassium': {'type': 'numeric', 'min': 230.478897122857, 'max': 250.798391983322},
+    'Category_pH': {'type': 'categorical', 'values': ['low_acidic']},
+    'Soil_Type': {'type': 'categorical', 'values': ['Loam']},
+    'Season': {'type': 'categorical', 'values': ['Spring', 'Summer']},
+    'N_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0},
+    'P_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0},
+    'K_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0}
+}
+
+# Tłumaczenia nazw pól (opcjonalnie dodaj więcej jeśli chcesz)
+translations = {
+    'Fertility': 'Żyzność',
+    'Photoperiod': 'Fotoperiod',
+    'Temperature': 'Temperatura (°C)',
+    'Rainfall': 'Opady (mm)',
+    'pH': 'pH gleby',
+    'Light_Hours': 'Liczba godzin światła',
+    'Light_Intensity': 'Natężenie światła (lux)',
+    'Rh': 'Wilgotność względna (%)',
+    'Nitrogen': 'Azot (N)',
+    'Phosphorus': 'Fosfor (P)',
+    'Potassium': 'Potas (K)',
+    'Category_pH': 'Kategoria pH',
+    'Soil_Type': 'Typ gleby',
+    'Season': 'Sezon',
+    'N_Ratio': 'Stosunek N (%)',
+    'P_Ratio': 'Stosunek P (%)',
+    'K_Ratio': 'Stosunek K (%)'
+}
 
 st.title("Predykcja truskawek")
-## TODO zmiana uniwersum AUT na SOIL NUTRIENTS!
 
-mark = st.selectbox("Marka", [
-    "opel", "audi", "bmw", "volkswagen", "ford", "mercedes-benz", "renault", "toyota", "skoda", "alfa-romeo",
-    "chevrolet", "citroen", "fiat", "honda", "hyundai", "kia", "mazda", "mini", "mitsubishi", "nissan",
-    "peugeot", "seat", "volvo"
-])
-model = st.text_input("Model")
-year = st.slider("Rok produkcji", min_value=1971, max_value=2022, value=2015)
-mileage = st.number_input("Przebieg (km)", min_value=1, max_value=2800000, value=100000, step=1000)
-vol_engine = st.number_input("Pojemność silnika (cm³)", min_value=850, max_value=2796, value=1248, step=1)
-fuel = st.selectbox("Rodzaj paliwa", [
-    "Diesel", "CNG", "Gasoline", "LPG", "Hybrid", "Electric"
-])
-province = st.selectbox("Województwo", [
-    "Mazowieckie", "Śląskie", "Opolskie", "Dolnośląskie", "Lubelskie", "Wielkopolskie", "Warmińsko-mazurskie",
-    "Małopolskie", "Podkarpackie", "Kujawsko-pomorskie", "Pomorskie", "Podlaskie", "Łódzkie", "Świętokrzyskie",
-    "Zachodniopomorskie", "Lubuskie", "Berlin", "Wiedeń", "Niedersachsen", "Moravian-Silesian Region",
-])
-age_years = current_year - year
-mileage_per_year = mileage / (age_years if age_years != 0 else 1)
+user_input = {}
 
-st.number_input("Wiek pojazdu (lata)", value=age_years, disabled=True)
-st.number_input("Średni przebieg roczny (km)", value=round(mileage_per_year, 2), disabled=True)
+# Tworzenie pól
+for feature, info in feature_info.items():
+    label = translations.get(feature, feature)
+    if info['type'] == 'categorical':
+        default = info['values'][0] if info['values'] else None
+        user_input[feature] = st.selectbox(label, options=info['values'], index=0)
+    elif info['type'] == 'numeric':
+        min_val = info['min']
+        max_val = info['max']
+        default = (min_val + max_val) / 2
+        if min_val == max_val:
+            user_input[feature] = st.number_input(label, value=min_val, step=0.0, format="%.4f")
+        else:
+            user_input[feature] = st.slider(label, min_value=min_val, max_value=max_val, value=default, format="%.4f")
 
-if st.button("Oblicz"):
-    input_df = pd.DataFrame([{
-        "mark": mark,
-        "model": model.lower(),
-        "year": year,
-        "mileage": mileage,
-        "vol_engine": vol_engine,
-        "fuel": fuel,
-        "province": province,
-        "age_years": age_years,
-        "mileage_per_year": mileage_per_year
-    }])
+# Reakcja na przycisk
+if st.button("Sprawdź predykcję"):
+    input_df = pd.DataFrame([user_input])
+    st.subheader("Dane wejściowe:")
+    st.dataframe(input_df)
+
     prediction = predict_model(ai_model, data=input_df)
-    # st.write(f"Predication: {prediction}")
     predicted_price = prediction.loc[0, 'prediction_label']
-    st.success(f"Predykcja: {predicted_price} zł")
+    st.success(f"Predykcja: {predicted_price}")
