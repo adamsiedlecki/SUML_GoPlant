@@ -8,15 +8,15 @@ ai_model = load_model('best_model')
 
 feature_info = {
     'Photoperiod': {'type': 'categorical', 'values': ['Day Neutral', 'Short Day Period']},
-    'Temperature': {'type': 'numeric', 'min': 11.4895951867279, 'max': 24.7851260541969},
-    'Rainfall': {'type': 'numeric', 'min': 603.262466985949, 'max': 912.357821862667},
-    'pH': {'type': 'numeric', 'min': 6.01954182231121, 'max': 6.83444527129809},
-    'Light_Hours': {'type': 'numeric', 'min': 11.9530915745843, 'max': 14.0224375398152},
-    'Light_Intensity': {'type': 'numeric', 'min': 397.678455866516, 'max': 608.36827590609},
-    'Rh': {'type': 'numeric', 'min': 89.5019906720046, 'max': 95.1292528088176},
-    'Nitrogen': {'type': 'numeric', 'min': 151.499465257155, 'max': 200.356849479585},
-    'Phosphorus': {'type': 'numeric', 'min': 110.976211751343, 'max': 129.848646332759},
-    'Potassium': {'type': 'numeric', 'min': 230.478897122857, 'max': 250.798391983322},
+    'Temperature': {'type': 'numeric', 'min': 5., 'max': 30.},
+    'Rainfall': {'type': 'numeric', 'min': 0., 'max': 915.},
+    'pH': {'type': 'numeric', 'min': 4., 'max': 7.},
+    'Light_Hours': {'type': 'numeric', 'min': 8., 'max': 14.},
+    'Light_Intensity': {'type': 'numeric', 'min': 397., 'max': 608.},
+    'Rh': {'type': 'numeric', 'min': 80., 'max': 95.},
+    'Nitrogen': {'type': 'numeric', 'min': 150., 'max': 200.},
+    'Phosphorus': {'type': 'numeric', 'min': 110., 'max': 129.},
+    'Potassium': {'type': 'numeric', 'min': 200., 'max': 250.},
     'Season': {'type': 'categorical', 'values': ['Spring', 'Summer']},
 }
 
@@ -34,7 +34,7 @@ translations = {
     'Season': 'Sezon',
 }
 
-st.title("Predykcja truskawek")
+st.title("Predykcja zbioru truskawek")
 
 user_input = {}
 
