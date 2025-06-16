@@ -15,7 +15,7 @@ def train_model(train_data):
     best_model = compare_models(include=[
         'lr',        # Linear Regression (baseline)
         'ridge',     # Regularized linear model (L2)
-        # 'lightgbm',  # Gradient boosting, fast and accurate
+        'rf',  # random forest
         'mlp',       # Perceptron wielowarstwowy
     ])
 
