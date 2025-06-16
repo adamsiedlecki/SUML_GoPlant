@@ -44,5 +44,4 @@ jobs:
           mv best_model.pkl modele/
           git add modele/best_model.pkl
           git commit -m "Add trained model"
-
           git push origin --force temp-model-branch:modele
