@@ -7,7 +7,6 @@ from pycaret.regression import load_model, predict_model
 ai_model = load_model('best_model')
 
 feature_info = {
-    'Fertility': {'type': 'categorical', 'values': ['Moderate']},
     'Photoperiod': {'type': 'categorical', 'values': ['Day Neutral', 'Short Day Period']},
     'Temperature': {'type': 'numeric', 'min': 11.4895951867279, 'max': 24.7851260541969},
     'Rainfall': {'type': 'numeric', 'min': 603.262466985949, 'max': 912.357821862667},
@@ -18,17 +17,11 @@ feature_info = {
     'Nitrogen': {'type': 'numeric', 'min': 151.499465257155, 'max': 200.356849479585},
     'Phosphorus': {'type': 'numeric', 'min': 110.976211751343, 'max': 129.848646332759},
     'Potassium': {'type': 'numeric', 'min': 230.478897122857, 'max': 250.798391983322},
-    'Category_pH': {'type': 'categorical', 'values': ['low_acidic']},
-    'Soil_Type': {'type': 'categorical', 'values': ['Loam']},
     'Season': {'type': 'categorical', 'values': ['Spring', 'Summer']},
-    'N_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0},
-    'P_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0},
-    'K_Ratio': {'type': 'numeric', 'min': 10.0, 'max': 10.0}
 }
 
 translations = {
-    'Fertility': 'Żyzność',
-    'Photoperiod': 'Fotoperiod',
+    'Photoperiod': 'Długość dnia świetlnego (Photoperiod)',
     'Temperature': 'Temperatura (°C)',
     'Rainfall': 'Opady (mm)',
     'pH': 'pH gleby',
@@ -38,12 +31,7 @@ translations = {
     'Nitrogen': 'Azot (N)',
     'Phosphorus': 'Fosfor (P)',
     'Potassium': 'Potas (K)',
-    'Category_pH': 'Kategoria pH',
-    'Soil_Type': 'Typ gleby',
     'Season': 'Sezon',
-    'N_Ratio': 'Stosunek N (%)',
-    'P_Ratio': 'Stosunek P (%)',
-    'K_Ratio': 'Stosunek K (%)'
 }
 
 st.title("Predykcja truskawek")
@@ -66,8 +54,8 @@ for feature, info in feature_info.items():
 
 if st.button("Sprawdź predykcję"):
     input_df = pd.DataFrame([user_input])
-    st.subheader("Dane wejściowe:")
-    st.dataframe(input_df)
+    # st.subheader("Dane wejściowe:")
+    # st.dataframe(input_df)
 
     prediction = predict_model(ai_model, data=input_df)
     predicted_price = prediction.loc[0, 'prediction_label']

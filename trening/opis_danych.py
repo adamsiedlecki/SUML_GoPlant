@@ -28,7 +28,7 @@ def summarize_dataframe(df):
 # Przykład użycia:
 if __name__ == "__main__":
     df = pd.read_csv("Soil Nutrients.csv")
-    df = df[df['Name'] == 'Strawberry']  # chcemy uczyć tylko o truskawce
+    # df = df[df['Name'] == 'Strawberry']  # chcemy uczyć tylko o truskawce
     df = df.drop(columns=['Name'])
 
     liczba_wierszy = len(df)
