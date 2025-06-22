@@ -1,0 +1,18 @@
+version: '3.8'
+
+networks:
+  suml-pro-net:
+    driver: bridge
+
+services:
+  suml-pro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - suml:pro
+    image: suml:pro
+    ports:
+      - "8501:8501"
+    container_name: suml_pro
+    restart: unless-stopped
