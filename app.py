@@ -1,8 +1,23 @@
 import streamlit as st
 import pandas as pd
 from pycaret.regression import load_model, predict_model
+import matplotlib.pyplot as plt
 
 # TODO usunięcie częśći pól (trzeba przetrenować model), poprawa interfejsu, może tłumaczenia dla wartości
+
+with st.expander("ℹ️ Porady dla plantatorów"):
+    st.markdown("""
+    **Optymalne warunki dla truskawek:**
+    - Temperatura: 18-22°C w dzień, 10-13°C w nocy
+    - Wilgotność: 80-85% podczas kwitnienia
+    - pH gleby: 5.5-6.5
+    - Nawożenie: N-P-K w proporcjach 2:1:3
+    
+    **Częste problemy:**
+    - Zbyt wysoka temperatura (>25°C) - redukcja owocowania
+    - Niskie pH (<5.0) - niedobór wapnia
+    - Nadmiar azotu - bujny wzrost liści kosztem owoców
+    """)
 
 ai_model = load_model('best_model')
 
@@ -76,5 +91,89 @@ if st.button("Sprawdź predykcję"):
 
     prediction = predict_model(ai_model, data=input_df)
     predicted_price = prediction.loc[0, 'prediction_label']
+    st.session_state.current_prediction = predicted_price
+
     st.success(f"Przewidywany plon: {predicted_price} kg/ha")
     st.info("Wynik przedstawia przewidywaną wydajność uprawy w kilogramach na hektar")
+
+    #wykresik
+    fig, ax = plt.subplots(figsize=(10, 3))
+    
+    yield_ranges = {
+        "Niski": (18.0, 19.0, "#ff4b4b"),
+        "Średni": (19.0, 20.5, "#ffdc4b"),
+        "Dobry": (20.5, 21.5, "#a1ff4b"),
+        "Doskonały": (21.5, 22.5, "#4bff6a")
+    }
+    
+    current_category = "Niski"
+    for category, (low, high, color) in yield_ranges.items():
+        if low <= predicted_price < high:
+            current_category = category
+            current_color = color
+            break
+    
+    for category, (low, high, color) in yield_ranges.items():
+        ax.barh(category, high - low, left=low, color=color, alpha=0.4)
+    
+    ax.barh(current_category, predicted_price, color=current_color, height=0.5)
+    
+    ax.text(predicted_price, list(yield_ranges.keys()).index(current_category), 
+            f' {predicted_price:.2f} kg/ha', 
+            ha='left', va='center', fontsize=12, fontweight='bold')
+    
+    ax.set_xlim(17.8, 22.5) 
+    ax.set_xlabel('Plon (kg/ha)')
+    ax.set_title('Poziom plonów w porównaniu do skali efektywności', fontsize=14)
+    ax.grid(True, linestyle='--', alpha=0.7)
+    
+    for value in [19.0, 20.5, 21.5]:
+        ax.axvline(value, color='gray', linestyle='--', alpha=0.5)
+    
+    st.pyplot(fig)
+
+    if predicted_price >= 21.5:
+        st.success("Bardzo dobre warunki sprzyjające bogatym zbiorom")
+    elif predicted_price >= 20.5:
+        st.success("Dobre warunki sprzyjające przyzwoitym zbiorom")
+    elif predicted_price >= 19.0:
+        st.info("Średnie warunki sprzyjające akceptowalnym zbiorom")
+    else:
+        st.warning("Warunki poniżej optymalnych - rozważ zmiany w uprawie")
+
+st.divider()
+with st.expander("Eksport wyników"):
+    if 'history' not in st.session_state:
+        st.session_state.history = []
+    
+    if st.button("Zapisz obecny wynik"):
+        try:
+            if 'current_prediction' in st.session_state:
+                new_entry = {
+                    **user_input,
+                    'przewidywany_plon': st.session_state.current_prediction,
+                    'timestamp': pd.Timestamp.now()
+                }
+                st.session_state.history.append(new_entry)
+                st.success("Wynik zapisany!")
+            else:
+                st.warning("Najpierw wykonaj predykcję przed zapisem")
+        except Exception as e:
+            st.error(f"Błąd podczas zapisu: {e}")
+    
+    if st.session_state.history:
+        history_df = pd.DataFrame(st.session_state.history)
+        base_columns = [col for col in feature_info.keys()]
+        column_order = base_columns + ['przewidywany_plon', 'timestamp']
+        history_df = history_df.reindex(columns=column_order)
+        
+        st.dataframe(history_df)
+        
+        csv = history_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            "Pobierz historię",
+            csv,
+            "historia_predykcji_truskawek.csv",
+            "text/csv")
+    else:
+        st.info("Brak zapisanych wyników")
