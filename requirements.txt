@@ -2,3 +2,4 @@ pycaret==3.3.2
 pandas
 streamlit==1.25.0
 matplotlib
+huggingface_hub

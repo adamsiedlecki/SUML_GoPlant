@@ -1,0 +1,41 @@
+name: Train Model
+
+on:
+  push:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train Model
+        run: cd trening && python trening.py
+
+      - name: Push model to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.STACHNIK_SECRET }}
+        run: |
+          python -c "
+          from huggingface_hub import HfApi
+          api = HfApi()
+          api.upload_file(
+          path_or_fileobj='trening/best_model.pkl',
+          path_in_repo='best_model.pkl',
+          repo_id='s25304/suml_model',
+          token='${HF_TOKEN}'
+          )
+          "
+
+
+
