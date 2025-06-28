@@ -1,0 +1,27 @@
+name: Deploy goPlant app to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.STACHNIK_SECRET }}
+        run: |
+          git config --global user.email "ci@github-actions.com"
+          git config --global user.name "GitHub Actions"
+          git clone https://huggingface.co/spaces/s25304/goPlant
+          rsync -av --exclude='.git' ./ goPlant/
+          cd goPlant
+          git add .
+          git commit -m "Update from GitHub Actions"
+          git remote set-url origin https://s25304:${HF_TOKEN}@huggingface.co/spaces/s25304/goPlant
+          git push origin main

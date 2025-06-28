@@ -1,11 +1,10 @@
-https://www.kaggle.com/datasets/manutrex78/plant-healt-dataset?resource=download
-
-https://www.kaggle.com/datasets/snmahsa/soil-nutrients/data
-
-Zbiór csv należy umieścić w katalogu trening.
-
-
-TODO lista z ćwiczeń:
-- streamlit
-- docker
-- deploy na ci/cd github actions (nie musi mieć dużo sensu ale ma się coś dziać)
+---
+title: goPlant app
+emoji: "🌱"
+colorFrom: "green"
+colorTo: "blue"
+sdk: docker
+sdk_version: "0.0.1"
+app_file: app.py
+pinned: false
+---

@@ -13,6 +13,6 @@ services:
         - suml:pro
     image: suml:pro
     ports:
-      - "8501:8501"
+      - "7860:7860"
     container_name: suml_pro
     restart: unless-stopped
